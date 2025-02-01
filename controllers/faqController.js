@@ -46,8 +46,8 @@ export const createFaqTranslations = async (req, res) => {
 
         const newTranslation = await FaqTranslation.create({
             language: lang,
-            question: "भारत की राजधानी क्या है?",
-            answer: "भारत की राजधानी नई दिल्ली है"
+            question: "Quelle est votre politique de remboursement ?",
+            answer: "Nous offrons une garantie de remboursement de 30 jours."
         });
 
         const newFaq = await Faq.create({ question, answer, translations: [newTranslation._id] });

@@ -35,7 +35,7 @@ app.use('/*', (req, res) => {
     res.status(400).json({ message: `route ${req.originalUrl} Does not exist` })
 })
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`Server is running at Port:${PORT}`)
 })
