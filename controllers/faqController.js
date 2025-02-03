@@ -1,7 +1,23 @@
-import { translate } from '@vitalets/google-translate-api'
 import FaqTranslation from '../models/faqTranslationSchema.js'
 import Faq from '../models/faqSchema.js'
 import redisClient from '../index.js'
+import * as deepl from 'deepl-node'
+
+async function translateText(question, answer, to) {
+
+    const authKey = process.env.AUTH_KEY
+    const translator = new deepl.Translator(authKey)
+
+    const questionTranslation = await translator.translateText(question, null, to);
+    const answerTranslation = await translator.translateText(answer, null, to);
+
+    const newTranslation = await FaqTranslation.create({
+        language: to,
+        question: questionTranslation.text,
+        answer: answerTranslation.text
+    })
+    return newTranslation
+}
 
 export const createFaqTranslations = async (req, res) => {
     try {
@@ -22,14 +38,7 @@ export const createFaqTranslations = async (req, res) => {
                     faq: existingFaq
                 })
             } else {
-                // const questionTranslation = await translate(question, { to: lang })
-                // const answerTranslation = await translate(answer, { to: lang })
-
-                const newTranslation = await FaqTranslation.create({
-                    language: lang,
-                    question: "ভারতের রাজধানী কি?",
-                    answer: "ভারতের রাজধানী হল নতুন দিল্লি"
-                });
+                const newTranslation = await translateText(question, answer, lang)
 
                 existingFaq.translations.push(newTranslation._id)
                 await existingFaq.save()
@@ -41,14 +50,7 @@ export const createFaqTranslations = async (req, res) => {
             }
         }
 
-        // const questionTranslation = await translate(question, { to: lang })
-        // const answerTranslation = await translate(answer, { to: lang })
-
-        const newTranslation = await FaqTranslation.create({
-            language: lang,
-            question: "Quelle est votre politique de remboursement ?",
-            answer: "Nous offrons une garantie de remboursement de 30 jours."
-        });
+        const newTranslation = await translateText(question, answer, lang)
 
         const newFaq = await Faq.create({ question, answer, translations: [newTranslation._id] });
         res.status(201).json({
